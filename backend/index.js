@@ -69,6 +69,34 @@ app.get("/books/:id", async (request, response) => {
   }
 });
 
+/* route for updating book */
+app.put("/books/:id", async (request, response) => {
+  try {
+    if (
+      !request.body.title ||
+      !request.body.author ||
+      !request.body.publishedYear
+    ) {
+      return response.status(400).send({
+        message: "type all required fields: title, author, publishedYear",
+      });
+    }
+
+    const { id } = request.params;
+    const result = await Book.findByIdAndUpdate(id, request.body);
+
+    if (!result) {
+      return response.status(404).json({ message: "book not found" });
+    }
+    return response
+      .status(200)
+      .send({ message: "book is updated successfully" });
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
 /* mongodb database connect */
 mongoose
   .connect(mongoDBURL)
